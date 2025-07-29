@@ -2,7 +2,7 @@
 from typing import Annotated
 from workout_api.contrib.schemas import BaseSchema
 from pydantic import Field, PositiveFloat
-from workout_api.categorias.categoria_schema import CategoriaSchemaIn
+from workout_api.categoria.categoria_schema import CategoriaSchemaIn
 from workout_api.centro_treinamento.centro_treinamento_schema import CentroTreinamentoSchemaAtleta 
 
 class AtletaSchema(BaseSchema):

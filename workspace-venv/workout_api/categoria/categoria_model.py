@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from workout_api.atleta.atleta_model import AtletaModel
 
 class CategoriaModel(BaseModel):
-    __tablename__ = "categorias"
+    __tablename__ = "categoria"
     
     pk_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     nome: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)

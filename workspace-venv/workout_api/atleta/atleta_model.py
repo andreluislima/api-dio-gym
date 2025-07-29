@@ -4,11 +4,11 @@ from datetime import datetime
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped,mapped_column, relationship
 from workout_api.contrib.models import BaseModel
-from workout_api.categorias.categoria_model import CategoriaModel
+from workout_api.categoria.categoria_model import CategoriaModel
 from workout_api.centro_treinamento.centro_treinamento_model import CentroTreinamentoModel
 
 class AtletaModel(BaseModel):
-    __tablename__ = 'atletas'
+    __tablename__ = 'atleta'
 
     pk_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     nome: Mapped[str] = mapped_column(String(50), nullable=False)
@@ -19,8 +19,8 @@ class AtletaModel(BaseModel):
     genero: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     
-    categoria_id: Mapped[int] = mapped_column(ForeignKey("categorias.pk_id"))
-    categoria: Mapped["CategoriaModel"] = relationship("CategoriaModel", back_populates="atletas", lazy='selectin')
+    categoria_id: Mapped[int] = mapped_column(ForeignKey("categoria.pk_id"))
+    categoria: Mapped["CategoriaModel"] = relationship("CategoriaModel", back_populates="atleta", lazy='selectin')
 
     centro_treinamento_id: Mapped[int] = mapped_column(ForeignKey("centro_treinamento.pk_id"))
-    centro_treinamento: Mapped["CentroTreinamentoModel"] = relationship("CentroTreinamentoModel", back_populates="atletas", lazy='selectin')
+    centro_treinamento: Mapped["CentroTreinamentoModel"] = relationship("CentroTreinamentoModel", back_populates="atleta", lazy='selectin')
