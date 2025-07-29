@@ -1,0 +1,4 @@
+
+from workout_api.atleta.atleta_model import AtletaModel
+from workout_api.categorias.categoria_model import CategoriaModel
+from workout_api.centro_treinamento.centro_treinamento_model import CentroTreinamentoModel
