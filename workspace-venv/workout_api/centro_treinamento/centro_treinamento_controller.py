@@ -9,25 +9,25 @@ from workout_api.centro_treinamento.centro_treinamento_model import CentroTreina
 
 router = APIRouter()
 
-# @router.post(
-#     path='/',
-#     summary='Criar novo CT',
-#     status_code=status.HTTP_201_CREATED,
-#     response_model=CentroTreinamentoSchemaOut
-# )
-# async def Post(
-#     db_session:DatabaseDependency, 
-#     CentroTreinamentoSchemaIn: CentroTreinamentoSchemaIn = Body()
-# )-> CentroTreinamentoSchemaOut: # type: ignore
+@router.post(
+    path='/',
+    summary='Criar novo CT',
+    status_code=status.HTTP_201_CREATED,
+    response_model=CentroTreinamentoSchemaOut
+)
+async def Post(
+    db_session:DatabaseDependency, 
+    CentroTreinamentoSchemaIn: CentroTreinamentoSchemaIn = Body()
+)-> CentroTreinamentoSchemaOut: # type: ignore
     
-#     centroTreinamentoOut = CentroTreinamentoSchemaOut(id=uuid4(), ** CentroTreinamentoSchemaIn.model_dump()) 
-#     centroTreinamentoModel = CentroTreinamentoModel(**centroTreinamentoOut.model_dump())
+    centroTreinamentoOut = CentroTreinamentoSchemaOut(id=uuid4(), ** CentroTreinamentoSchemaIn.model_dump()) 
+    centroTreinamentoModel = CentroTreinamentoModel(**centroTreinamentoOut.model_dump())
     
-#     db_session.add(CentroTreinamentoModel)
-#     await db_session.commit()
-#     await db_session.refresh(centroTreinamentoModel)
+    db_session.add(centroTreinamentoModel)
+    await db_session.commit()
+    await db_session.refresh(centroTreinamentoModel)
     
-#     return centroTreinamentoOut
+    return centroTreinamentoOut
 
 
 @router.get(
