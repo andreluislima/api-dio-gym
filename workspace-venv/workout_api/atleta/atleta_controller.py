@@ -25,43 +25,58 @@ router = APIRouter()
 async def post(
     db_session:DatabaseDependency,
     atleta_in: AtletaSchemaIn = Body()
-)-> AtletaSchemaOut: # type:ignore
-    
-    categoria_nome = atleta_in.categoria.nome
-    centro_treinamento_nome = atleta_in.centro_treinamento.nome
-    
-    categoria = (await db_session.execute(select(CategoriaModel).filter_by(nome = categoria_nome))).scalars().first()
-    
-    if not categoria:
-        raise HTTPException(
-            status_code= status.HTTP_400_BAD_REQUEST,
-            detail=f'A categoria {categoria_nome} não foi encontrada'
-        )
-        
-    centro_treinamento = (await db_session.execute(select(CentroTreinamentoModel).filter_by(nome = centro_treinamento_nome))).scalars().first()
-    
-    if not centro_treinamento:
-        raise HTTPException(
-            status_code = status.HTTP_400_BAD_REQUEST,
-            detail=f'O Centro de Treinamento {centro_treinamento_nome} não foi encontrado'
-        )
-    
+)-> AtletaSchemaOut:
+
     try:
-        atleta_out = AtletaSchemaOut(id=uuid4(), created_at= datetime.now(timezone.utc), **atleta_in.model_dump())
+        cpf_existente = (await db_session.execute(
+            select(AtletaModel).filter_by(cpf=atleta_in.cpf)
+        )).scalars().first()
+
+        if cpf_existente:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"O CPF {atleta_in.cpf} já está cadastrado."
+            )
+
+        categoria = (await db_session.execute(
+            select(CategoriaModel).filter_by(nome=atleta_in.categoria.nome)
+        )).scalars().first()
+
+        if not categoria:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Categoria '{atleta_in.categoria.nome}' não encontrada."
+            )
+
+        centro_treinamento = (await db_session.execute(
+            select(CentroTreinamentoModel).filter_by(nome=atleta_in.centro_treinamento.nome)
+        )).scalars().first()
+
+        if not centro_treinamento:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Centro de Treinamento '{atleta_in.centro_treinamento.nome}' não encontrado."
+            )
+
+        atleta_out = AtletaSchemaOut(id=uuid4(), created_at=datetime.now(timezone.utc), **atleta_in.model_dump())
         atleta_model = AtletaModel(**atleta_out.model_dump(exclude={'categoria', 'centro_treinamento'}))
-        
+
         atleta_model.categoria_id = categoria.pk_id
         atleta_model.centro_treinamento_id = centro_treinamento.pk_id
-        
+
         db_session.add(atleta_model)
         await db_session.commit()
-    
+
+        return atleta_out
+
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
-            status_code= status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f'Erro ao inserir os dados no banco. {str(e)}'
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Erro inesperado ao salvar o atleta: {str(e)}"
         )
-    return atleta_out
+
 
 # GET ALL
 @router.get(
