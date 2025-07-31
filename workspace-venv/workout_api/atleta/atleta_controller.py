@@ -90,7 +90,7 @@ async def query( # type: ignore
         db_session: DatabaseDependency,
         nome: Optional[str] = Query(default=None, description="Filtrar por nome"),
         cpf: Optional[str] = Query(default=None, description="Filtrar por CPF")
-    )-> list[AtletaSchemaListOut]: # type: ignore 
+    )-> Page[AtletaSchemaListOut]: # type: ignore 
 
     stmt = select(AtletaModel).options(
         selectinload(AtletaModel.centro_treinamento),
@@ -106,14 +106,14 @@ async def query( # type: ignore
     result =  await db_session.execute(stmt)
     atletas = result.scalars().all()
     
-    return [
+    return paginate([
         AtletaSchemaListOut(
             nome=atleta.nome,
             centro_treinamento=CentroTreinamentoSchemaAtleta(nome=atleta.centro_treinamento.nome),
             categoria=CategoriaSchemaIn(nome=atleta.categoria.nome)
         )
         for atleta in atletas
-    ]
+    ])
 
   
     
