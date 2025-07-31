@@ -3,7 +3,7 @@
 &#x20;   &#x20;
 
 > API para gerenciamento de academia construída com **FastAPI**, **PostgreSQL**, **SQLAlchemy**, **Alembic** e **Docker**.
-
+Essa API foi implementada como parte do primeiro projeto do desafio 01 de Python do Bootcamp SANTANDER | DIO
 ---
 
 ## 📚 Índice
@@ -151,11 +151,9 @@ curl -X POST "http://127.0.0.1:8000/atletas/" \
 **Response:**
 
 ```json
-curl -X 'POST' \
-  'http://127.0.0.1:8000/atletas/' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -d '{
+{
+  "id": "09c3eae3-6a93-45cc-9259-e872900647d9",
+  "created_at": "2025-07-31T17:49:34.070490Z",
   "nome": "Rodrigo de Lima",
   "cpf": "18765432100",
   "idade": 42,
@@ -168,7 +166,7 @@ curl -X 'POST' \
   "centro_treinamento": {
     "nome": "Equipe Prime"
   }
-}'
+}
 ```
 
 ### 🔹 Listar Atletas
