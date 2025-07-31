@@ -1,13 +1,17 @@
 from datetime import datetime, timezone
+from typing import Optional
 from uuid import UUID, uuid4
-from fastapi import APIRouter, Body, HTTPException, status
+from fastapi import APIRouter, Body, HTTPException, Query, status
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from workout_api.atleta.atleta_model import AtletaModel
-from workout_api.atleta.atleta_schema import AtletaSchemaIn, AtletaSchemaOut, AtletaSchemaUpdate
+from workout_api.atleta.atleta_schema import AtletaSchemaIn, AtletaSchemaOut, AtletaSchemaUpdate, AtletaSchemaListOut
 from workout_api.contrib.dependencies import DatabaseDependency
 from workout_api.categoria.categoria_model import CategoriaModel
+from workout_api.categoria.categoria_schema import CategoriaSchemaOut, CategoriaSchemaIn
 from workout_api.centro_treinamento.centro_treinamento_model import CentroTreinamentoModel
+from workout_api.centro_treinamento.centro_treinamento_schema import CentroTreinamentoSchemaOut, CentroTreinamentoSchemaAtleta
 
 router = APIRouter()
 
@@ -64,15 +68,39 @@ async def post(
     path='/',
     summary='Consultar todos os atletas registrados',
     status_code=status.HTTP_200_OK,
-    response_model=list[AtletaSchemaOut]
+    response_model=list[AtletaSchemaListOut]
 )
-async def query(db_session: DatabaseDependency) -> list[AtletaSchemaOut]: # type: ignore
-    
-    atletas: list[AtletaSchemaOut] = (await db_session.execute(select(AtletaModel))).scalars().all() # type:ignore
-    
-    return[AtletaSchemaOut.model_validate(atleta) for atleta in atletas]
-    
+async def query( # type: ignore
+        db_session: DatabaseDependency,
+        nome: Optional[str] = Query(default=None, description="Filtrar por nome"),
+        cpf: Optional[str] = Query(default=None, description="Filtrar por CPF")
+    )-> list[AtletaSchemaListOut]: # type: ignore 
 
+    stmt = select(AtletaModel).options(
+        selectinload(AtletaModel.centro_treinamento),
+        selectinload(AtletaModel.categoria)
+    )
+    
+    if nome:
+        stmt = stmt.filter(AtletaModel.nome.ilike(f'{nome}'))
+    
+    if cpf:
+        stmt = stmt.filter(AtletaModel.cpf == cpf)
+
+    result =  await db_session.execute(stmt)
+    atletas = result.scalars().all()
+    
+    return [
+        AtletaSchemaListOut(
+            nome=atleta.nome,
+            centro_treinamento=CentroTreinamentoSchemaAtleta(nome=atleta.centro_treinamento.nome),
+            categoria=CategoriaSchemaIn(nome=atleta.categoria.nome)
+        )
+        for atleta in atletas
+    ]
+
+  
+    
 # GET BY ID
 @router.get(
     path='/{id}',
@@ -92,6 +120,7 @@ async def query(id: UUID, db_session: DatabaseDependency) -> AtletaSchemaOut: # 
         )    
     return atleta
 
+# UPDATE
 @router.patch(
     path='/{id}',
     summary='Editar atleta pelo Id',
@@ -116,7 +145,7 @@ async def query(id:UUID, db_session:DatabaseDependency, atleta_up:AtletaSchemaUp
     
     return atleta
     
-
+# DELETE
 @router.delete(
      path='/{id}',
     summary='Remover atleta pelo Id',
