@@ -4,6 +4,7 @@ from uuid import UUID, uuid4
 from fastapi import APIRouter, Body, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
+from fastapi_pagination import Page, paginate
 
 from workout_api.atleta.atleta_model import AtletaModel
 from workout_api.atleta.atleta_schema import AtletaSchemaIn, AtletaSchemaOut, AtletaSchemaUpdate, AtletaSchemaListOut
@@ -83,7 +84,7 @@ async def post(
     path='/',
     summary='Consultar todos os atletas registrados',
     status_code=status.HTTP_200_OK,
-    response_model=list[AtletaSchemaListOut]
+    response_model=Page[AtletaSchemaListOut]
 )
 async def query( # type: ignore
         db_session: DatabaseDependency,

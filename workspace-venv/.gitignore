@@ -1,0 +1,38 @@
+# Byte-compiled / cache / virtual env
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env
+pyvenv.cfg
+
+# IDEs e configs locais
+.idea/
+.vscode/
+
+# Alembic migrations (versionadas localmente)
+alembic/versions/
+
+# Docker
+*.pid
+
+# Logs e bancos locais
+*.log
+*.sqlite3
+*.db
+
+# Pastas do Python base
+Lib/
+Include/
+Scripts/
+
+# Arquivos temporários
+*.tmp
+*.bak
+*.swp
